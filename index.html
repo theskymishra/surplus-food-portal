@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surplus Food Redistribution Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f5;
+            color: #24352b;
+        }
+
+        header {
+            background: #176b45;
+            color: white;
+            padding: 24px 6%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1250px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #52645a;
+        }
+
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #176b45;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #e6ece8;
+        }
+
+        th {
+            background: #edf5ef;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available {
+            background: #d9f5e4;
+            color: #176b45;
+        }
+
+        .reserved {
+            background: #fff0c7;
+            color: #805900;
+        }
+
+        .collected {
+            background: #dceaff;
+            color: #174d91;
+        }
+
+        .redistributed {
+            background: #e8ddff;
+            color: #59349b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            color: #52645a;
+        }
+
+        @media (max-width: 750px) {
+            .summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 420px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Surplus Food Redistribution Portal</h1>
+        <p>Connecting surplus food providers with community organizations.</p>
+    </header>
+
+    <main>
+        <h2>Redistribution Dashboard</h2>
+        <p>Track available food, collection deadlines and redistribution progress.</p>
+
+        <section class="summary">
+            <div class="card">
+                <h3>Available Records</h3>
+                <div class="number" id="availableCount">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Reserved Records</h3>
+                <div class="number" id="reservedCount">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Collected Records</h3>
+                <div class="number" id="collectedCount">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Redistributed Records</h3>
+                <div class="number" id="redistributedCount">0</div>
+            </div>
+        </section>
+
+        <h2>Surplus Food Listings</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Food Item</th>
+                        <th>Contributor</th>
+                        <th>Quantity</th>
+                        <th>Deadline</th>
+                        <th>Pickup Location</th>
+                        <th>Organization</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="foodTable"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        Food Waste Tracking and Redistribution Portal
+    </footer>
+
+    <script>
+        const foodRecords = [
+            {
+                item: "Vegetable Rice",
+                contributor: "Green Leaf Restaurant",
+                quantity: 25,
+                deadline: "2026-10-22 12:00",
+                location: "University Main Gate",
+                organization: "Helping Hands Foundation",
+                status: "Available"
+            },
+            {
+                item: "Fresh Bread",
+                contributor: "Campus Bakery",
+                quantity: 40,
+                deadline: "2026-10-22 13:00",
+                location: "University Food Court",
+                organization: "Community Care Trust",
+                status: "Reserved"
+            },
+            {
+                item: "Packed Meals",
+                contributor: "University Canteen",
+                quantity: 60,
+                deadline: "2026-10-22 14:00",
+                location: "Canteen Block A",
+                organization: "Helping Hands Foundation",
+                status: "Collected"
+            },
+            {
+                item: "Fresh Vegetables",
+                contributor: "Garden Bistro",
+                quantity: 18,
+                deadline: "2026-10-22 15:00",
+                location: "Library Entrance",
+                organization: "Green Earth Volunteers",
+                status: "Redistributed"
+            },
+            {
+                item: "Fruit Boxes",
+                contributor: "Fresh Basket Cafe",
+                quantity: 30,
+                deadline: "2026-10-22 16:00",
+                location: "Hostel Block C",
+                organization: "Community Care Trust",
+                status: "Available"
+            }
+        ];
+
+        const statuses = [
+            "Available",
+            "Reserved",
+            "Collected",
+            "Redistributed"
+        ];
+
+        function renderDashboard() {
+            document.getElementById("foodTable").innerHTML =
+                foodRecords.map(record => `
+                    <tr>
+                        <td>${record.item}</td>
+                        <td>${record.contributor}</td>
+                        <td>${record.quantity} kg</td>
+                        <td>${record.deadline}</td>
+                        <td>${record.location}</td>
+                        <td>${record.organization}</td>
+                        <td>
+                            <span class="status ${record.status.toLowerCase()}">
+                                ${record.status}
+                            </span>
+                        </td>
+                    </tr>
+                `).join("");
+
+            statuses.forEach(status => {
+                const count = foodRecords.filter(
+                    record => record.status === status
+                ).length;
+
+                document.getElementById(
+                    status.toLowerCase() + "Count"
+                ).textContent = count;
+            });
+        }
+
+        renderDashboard();
+    </script>
+</body>
+</html>
