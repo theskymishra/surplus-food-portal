@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +41,7 @@
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 16px;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .card {
@@ -60,6 +61,31 @@
             font-size: 30px;
             font-weight: bold;
             color: #176b45;
+        }
+
+        .quantity-card {
+            background: #176b45;
+            color: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        .quantity-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .quantity {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .quantity-card p {
+            margin: 8px 0 0;
+            font-size: 14px;
         }
 
         .table-container {
@@ -162,6 +188,12 @@
                 <h3>Redistributed Records</h3>
                 <div class="number" id="redistributedCount">0</div>
             </div>
+        </section>
+
+        <section class="quantity-card">
+            <h3>Estimated Food Quantity Available for Collection</h3>
+            <div class="quantity" id="availableQuantity">0 kg</div>
+            <p>Total quantity from food records currently marked as Available.</p>
         </section>
 
         <h2>Surplus Food Listings</h2>
@@ -271,6 +303,13 @@
                     status.toLowerCase() + "Count"
                 ).textContent = count;
             });
+
+            const availableQuantity = foodRecords
+                .filter(record => record.status === "Available")
+                .reduce((total, record) => total + record.quantity, 0);
+
+            document.getElementById("availableQuantity").textContent =
+                `${availableQuantity} kg`;
         }
 
         renderDashboard();
